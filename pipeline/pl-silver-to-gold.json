@@ -1,0 +1,336 @@
+{
+	"name": "pl-silver-to-gold",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get All Tables",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureTableSource",
+						"azureTableSourceQuery": "container eq 'silver' and jobEnable eq '1'",
+						"azureTableSourceIgnoreTableNotFound": false
+					},
+					"dataset": {
+						"referenceName": "ds_azure_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "For Each Bronze To Silver",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get All Tables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get All Tables').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Copy Data",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "@item().query",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"writeBehavior": "upsert",
+									"upsertSettings": {
+										"useTempDB": true,
+										"keys": {
+											"value": "@array(item().primaryKey)",
+											"type": "Expression"
+										}
+									},
+									"sqlWriterUseTableLock": false,
+									"tableOption": "autoCreate",
+									"disableMetricsCollection": false
+								},
+								"enableStaging": false,
+								"logSettings": {
+									"enableCopyActivityLog": true,
+									"copyActivityLogSettings": {
+										"logLevel": "Info",
+										"enableReliableLogging": true
+									},
+									"logLocationSettings": {
+										"linkedServiceName": {
+											"referenceName": "azure_data_lake_storage_gen2",
+											"type": "LinkedServiceReference"
+										},
+										"path": "synapse-logs/landing-logs"
+									}
+								},
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_azure_sql_database",
+									"type": "DatasetReference",
+									"parameters": {
+										"schema": {
+											"value": "@item().zone",
+											"type": "Expression"
+										},
+										"table": {
+											"value": "@item().table",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_azure_sql_database",
+									"type": "DatasetReference",
+									"parameters": {
+										"schema": {
+											"value": "@item().zone",
+											"type": "Expression"
+										},
+										"table": {
+											"value": "@item().table",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "Update Loading Control Success",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Copy Data",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlDWSource",
+									"additionalColumns": [
+										{
+											"name": "PartitionKey",
+											"value": {
+												"value": "@item().PartitionKey",
+												"type": "Expression"
+											}
+										},
+										{
+											"name": "RowKey",
+											"value": {
+												"value": "@item().RowKey",
+												"type": "Expression"
+											}
+										}
+									],
+									"sqlReaderQuery": "select 1 as jobStatus",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "AzureTableSink",
+									"azureTableInsertType": "merge",
+									"azureTablePartitionKeyName": {
+										"value": "PartitionKey",
+										"type": "Expression"
+									},
+									"azureTableRowKeyName": {
+										"value": "RowKey",
+										"type": "Expression"
+									},
+									"writeBatchSize": 10000
+								},
+								"enableStaging": false,
+								"logSettings": {
+									"enableCopyActivityLog": true,
+									"copyActivityLogSettings": {
+										"logLevel": "Info",
+										"enableReliableLogging": true
+									},
+									"logLocationSettings": {
+										"linkedServiceName": {
+											"referenceName": "azure_data_lake_storage_gen2",
+											"type": "LinkedServiceReference"
+										},
+										"path": "synapse-logs/landing-logs"
+									}
+								},
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "azure_synapse_analytics_serverless",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_azure_table",
+									"type": "DatasetReference"
+								}
+							]
+						},
+						{
+							"name": "Update Loading Control Fail",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Copy Data",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlDWSource",
+									"additionalColumns": [
+										{
+											"name": "PartitionKey",
+											"value": {
+												"value": "@item().PartitionKey",
+												"type": "Expression"
+											}
+										},
+										{
+											"name": "RowKey",
+											"value": {
+												"value": "@item().RowKey",
+												"type": "Expression"
+											}
+										}
+									],
+									"sqlReaderQuery": "select 0 as jobStatus",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "AzureTableSink",
+									"azureTableInsertType": "merge",
+									"azureTablePartitionKeyName": {
+										"value": "PartitionKey",
+										"type": "Expression"
+									},
+									"azureTableRowKeyName": {
+										"value": "RowKey",
+										"type": "Expression"
+									},
+									"writeBatchSize": 10000
+								},
+								"enableStaging": false,
+								"logSettings": {
+									"enableCopyActivityLog": true,
+									"copyActivityLogSettings": {
+										"logLevel": "Info",
+										"enableReliableLogging": true
+									},
+									"logLocationSettings": {
+										"linkedServiceName": {
+											"referenceName": "azure_data_lake_storage_gen2",
+											"type": "LinkedServiceReference"
+										},
+										"path": "synapse-logs/landing-logs"
+									}
+								},
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "azure_synapse_analytics_serverless",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_azure_table",
+									"type": "DatasetReference"
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"folder": {
+			"name": "3 - gold"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-10-16T19:28:21Z"
+	},
+	"type": "Microsoft.Synapse/workspaces/pipelines"
+}

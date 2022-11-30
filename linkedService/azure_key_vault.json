@@ -1,0 +1,11 @@
+{
+	"name": "azure_key_vault",
+	"type": "Microsoft.Synapse/workspaces/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://kv-acklen-avenue-asmt.vault.azure.net/"
+		}
+	}
+}

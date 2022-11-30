@@ -1,0 +1,20 @@
+{
+	"name": "organization_table",
+	"properties": {
+		"folder": {
+			"name": "silver_tables"
+		},
+		"content": {
+			"query": "select  \n        organizationkey as organization_key\n        ,case    when organizationkey < 100000 then 'organization 1'\n            else 'organization 2'\n        end as organization_description\n        ,periodicorganizationkey as periodic_organization_key\nfrom    openrowset(bulk 'https://saacklenavenueassessment.blob.core.windows.net/bronze/transaction_db/transaction_schema/transaction/transaction.parquet',\n                  format = 'parquet') as rows\ngroup   by\n        organizationkey\n        ,periodicorganizationkey\norder   by\n        1 desc",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

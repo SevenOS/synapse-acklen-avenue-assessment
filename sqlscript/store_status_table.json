@@ -1,0 +1,20 @@
+{
+	"name": "store_status_table",
+	"properties": {
+		"folder": {
+			"name": "silver_tables"
+		},
+		"content": {
+			"query": "select  *\nfrom\n(select  \n        case when storestatuskey = '(null)' then 0 else storestatuskey end as store_status_key\n        ,'default active status' store_status_description\nfrom    openrowset(bulk 'https://saacklenavenueassessment.blob.core.windows.net/bronze/transaction_db/transaction_schema/transaction/transaction.parquet',\n                  format = 'parquet') as rows\ngroup   by\n        case when storestatuskey = '(null)' then 0 else storestatuskey end\nunion\nselect\n        1\n        ,'inactive'\nunion\nselect  \n        storestatus2key as store_status_key\n        ,'active' as store_status_description\nfrom    openrowset(bulk 'https://saacklenavenueassessment.blob.core.windows.net/bronze/transaction_db/transaction_schema/transaction/transaction.parquet',\n                  format = 'parquet') as rows\ngroup   by\n        storestatus2key) tbl\norder   by\n        1",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

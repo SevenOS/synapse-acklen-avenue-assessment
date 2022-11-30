@@ -1,0 +1,20 @@
+{
+	"name": "store_table",
+	"properties": {
+		"folder": {
+			"name": "silver_tables"
+		},
+		"content": {
+			"query": "select  \n        storekey as store_key\n        ,concat('Store ', storekey) as store_description\n        ,case when storestatuskey = '(null)' then 0 else storestatuskey end as store_status_key\n        ,storestatus2key as store_status_key_2\nfrom    openrowset(bulk 'https://saacklenavenueassessment.blob.core.windows.net/bronze/transaction_db/transaction_schema/transaction/transaction.parquet',\n                  format = 'parquet') as rows\ngroup   by\n        storekey\n        ,concat('Store', storekey)\n        ,case when storestatuskey = '(null)' then 0 else storestatuskey end\n        ,storestatus2key\norder   by\n        1\n\n--test\n-- select count(storekey), storekey from\n-- (select  \n--         storekey\n--         ,case when storestatuskey = '(null)' then 0 else storestatuskey end as storestatuskey\n--         ,storestatus2key\n-- from    openrowset(bulk 'https://saacklenavenueassessment.blob.core.windows.net/bronze/transaction_db/transaction_schema/transaction/transaction.parquet',\n--                   format = 'parquet') as rows\n-- group   by\n--         storekey\n--         ,case when storestatuskey = '(null)' then 0 else storestatuskey end\n--         ,storestatus2key\n-- order   by\n--         1\n--         ) tbl\n--         group by storekey\n--         having count(*) > 1",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

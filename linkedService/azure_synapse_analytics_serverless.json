@@ -1,0 +1,29 @@
+{
+	"name": "azure_synapse_analytics_serverless",
+	"type": "Microsoft.Synapse/workspaces/linkedservices",
+	"properties": {
+		"parameters": {
+			"database": {
+				"type": "string",
+				"defaultValue": "master"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlDW",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synapse-acklen-avenue-assessment.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().database};User ID=synapse-admin",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "azure_key_vault",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "synapse-acklen-avenue-assessment-pwd"
+			}
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

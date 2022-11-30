@@ -1,0 +1,20 @@
+{
+	"name": "gold_dim_date",
+	"properties": {
+		"folder": {
+			"name": "gold_tables"
+		},
+		"content": {
+			"query": "DROP TABLE [gold].[dim_date]\nGO\n\nSET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\n\nCREATE TABLE [gold].[dim_date]\n( \n\t[date_sk] bigint  NOT NULL,\n\t[date_code] [date]  NULL,\n\t[calendar_year] [int]  NULL,\n\t[calendar_month] [int]  NULL,\n\t[week_day] [int]  NULL,\n\t[month_name] [varchar](30)  NULL,\n\t[month_name_short] [char](3)  NULL,\n\t[day_of_week] [varchar](30)  NULL,\n\t[day_of_week_short] [char](3)  NULL,\n\t[week_number] [int]  NULL,\n\t[week_start_date] [date]  NULL,\n\t[week_end_date] [date]  NULL,\n\t[calendar_year_month] [char](6)  NULL,\n\t[calendar_year_week] [char](6)  NULL,\n\t[quarter] [char](2)  NULL,\n\t[quarter_number] [smallint]  NULL,\n\t[quarter_name] [char](9)  NULL,\n\t[year_half_number] [smallint]  NULL,\n\t[year_half_name] [char](9)  NULL,\n\t[is_weekend] [bit]  NULL,\n\t[reporting_month_year] [varchar](30)  NULL,\n\t[reporting_month_year_short] [char](6)  NULL,\n\t[reporting_quarter_year] [varchar](10)  NULL\n)\nWITH\n(\n\tDISTRIBUTION = REPLICATE\n)\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "dw",
+				"poolName": "dw"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

@@ -1,0 +1,16 @@
+{
+	"name": "ds_azure_table",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "azure_table_storage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureTable",
+		"schema": [],
+		"typeProperties": {
+			"tableName": "loadingControl"
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

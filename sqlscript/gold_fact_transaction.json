@@ -1,0 +1,20 @@
+{
+	"name": "gold_fact_transaction",
+	"properties": {
+		"folder": {
+			"name": "gold_tables"
+		},
+		"content": {
+			"query": "DROP TABLE [gold].[fact_transaction]\nGO\n\nSET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\n\nCREATE TABLE [gold].[fact_transaction]\n( \n\t[transaction_sk] [varchar](80) NOT NULL,\n\t[transaction_partition_key] bigint  NULL,\n\t[transaction_date_sk] bigint  NULL,\n\t[business_date_sk] bigint  NULL,\n\t[profit_center_sk] bigint  NULL,\n\t[store_sk] [varchar](10)  NULL,\n\t[profit_center_sk_orig] bigint  NULL,\n\t[organization_sk] [varchar](14)  NULL,\n\t[qty_transactions] [int]  NULL,\n\t[charges] [float]  NULL,\n\t[avg_charges] [float]  NULL,\n\t[debit] [float]  NULL,\n\t[discounts] [float]  NULL,\n\t[taxes] [float]  NULL,\n\t[remittance] [float]  NULL,\n\t[guest_count] [int]  NULL,\n\t[refundamt] [float]  NULL,\n\t[misc_charges] [float]  NULL,\n\t[profit] [float]  NULL\n)\nWITH\n(\n\tCLUSTERED COLUMNSTORE INDEX,\n    DISTRIBUTION = HASH([transaction_partition_key]),\n    PARTITION   (   [transaction_partition_key] RANGE RIGHT FOR VALUES (202208,202209,202210,202211,202212) )\n)\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "dw",
+				"poolName": "dw"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

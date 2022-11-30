@@ -1,0 +1,20 @@
+{
+	"name": "gold_dim_store",
+	"properties": {
+		"folder": {
+			"name": "gold_tables"
+		},
+		"content": {
+			"query": "DROP TABLE [transaction_schema].[dim_store]\nGO\n\nSET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\n\nCREATE TABLE [gold].[dim_store]\n( \n\t[store_sk] [varchar](10)  NULL,\n\t[store_code] bigint  NULL,\n\t[store_description] [varchar](25)  NULL,\n\t[store_status_code] bigint  NULL,\n\t[store_status_description] [varchar](25)  NULL,\n\t[store_status_2_code] bigint  NULL,\n\t[store_status_description_2] [varchar](25)  NULL\n)\nWITH\n(\n\tDISTRIBUTION = REPLICATE\n)\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "dw",
+				"poolName": "dw"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

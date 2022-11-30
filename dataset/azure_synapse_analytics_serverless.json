@@ -1,0 +1,16 @@
+{
+	"name": "azure_synapse_analytics_serverless",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "azure_synapse_analytics_serverless",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"database": "master"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlDWTable",
+		"schema": []
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

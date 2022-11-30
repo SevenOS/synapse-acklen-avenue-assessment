@@ -1,0 +1,20 @@
+{
+	"name": "calendar_table",
+	"properties": {
+		"folder": {
+			"name": "silver_tables"
+		},
+		"content": {
+			"query": "select  date_key\n        ,cast(year(date_key) as int) as [calendar_year]\n        ,cast(month(date_key) as int) as [calendar_month]\n        ,cast(day(date_key) as int) as [week_day]\n        ,cast(datename(month, date_key) as varchar(30)) as [month_name]\n        ,cast(left(datename(month, date_key), 3) as char(3)) as [month_name_short]\n        ,cast(datename(weekday, date_key) as varchar(30)) as [day_of_week]\n        ,cast(left(datename(weekday, date_key), 3) as char(3)) as [day_of_week_short]\n        ,cast(case\n            when year(cast(dateadd(day, 1 - datepart(weekday, date_key), cast(date_key as date)) as date)) < year(dateadd(day, 7 - datepart(weekday, date_key), cast(date_key as date))) then 1\n            else datepart(iso_week, date_key)\n        end as int) as [week_number]\n        ,cast(dateadd(day, 1 - datepart(weekday, date_key), cast(date_key as date)) as date) [week_start_date]\n        ,cast(dateadd(day, 7 - datepart(weekday, date_key), cast(date_key as date)) as date) as [week_end_date]\n        ,cast(concat(year(date_key), right('0' + cast(month(date_key) as varchar(2)), 2)) as char(6)) as [calendar_year_month]\n        ,cast(concat(year(date_key), right('0' + cast(datepart(iso_week, date_key) as varchar(2)), 2)) as char(6)) as [calendar_year_week]\n        ,cast('q' + cast(datepart(quarter, date_key) as char(1)) as char(2)) as [quarter]\n        ,cast(right('0' + cast(datepart(quarter, date_key) as varchar(2)), 2) as smallint) as [quarter_number]\n        ,cast(case\n            when datepart(quarter, date_key) in (1, 2, 3) then 'jan - mar'\n            when datepart(quarter, date_key) in (4, 5, 6) then 'apr - jun'\n            when datepart(quarter, date_key) in (7, 8, 9) then 'jul - sep'\n            when datepart(quarter, date_key) in (10, 11, 12) then 'oct - dec'\n            else 'unknown'\n        end as char(9)) as [quarter_name]\n        ,cast(case\n            when month(date_key) between 1 and 6 then 1\n            when month(date_key) between 7 and 12 then 2\n            else 'unknown'\n        end as smallint) as [year_half_number]\n        ,cast(case\n            when month(date_key) between 1 and 6 then 'jan - jun'\n            when month(date_key) between 7 and 12 then 'jul - dec'\n            else 'unknown'\n        end as char(9)) as [year_half_name]\n        ,cast(case\n            when datename(weekday, date_key) in ('saturday', 'sunday') then 1\n            else 0\n        end as bit) as [is_weekend]\n        ,cast(concat(datename(month, date_key), '-', year(date_key)) as varchar(30)) as [reporting_month_year]\n        ,cast(concat(left(datename(month, date_key), 3), '-', right(year(date_key), 2)) as char(6)) as [reporting_month_year_short]\n        ,cast(concat('q', cast(datepart(quarter, date_key) as char(1)), year(date_key)) as varchar(10)) as [reporting_quarter_year]\nfrom    \n(select  transactiondatekey as date_key\nfrom    openrowset(bulk 'https://saacklenavenueassessment.blob.core.windows.net/bronze/transaction_db/transaction_schema/transaction/transaction.parquet',\n                  format = 'parquet') as rows\ngroup   by\n        transactiondatekey\nunion\nselect  businessdatekey as date_key\nfrom    openrowset(bulk 'https://saacklenavenueassessment.blob.core.windows.net/bronze/transaction_db/transaction_schema/transaction/transaction.parquet',\n                  format = 'parquet') as rows\ngroup   by\n        businessdatekey) as tbl\norder   by\n        1",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

@@ -1,0 +1,26 @@
+{
+	"name": "azure_sql_database",
+	"type": "Microsoft.Synapse/workspaces/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=sqlserver-acklen-avenue-assessment.database.windows.net;Initial Catalog=sqldb-acklen-avenue-assessment;User ID=sqlserver-admin",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "azure_key_vault",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "sqldb-acklen-avenue-assessment"
+			},
+			"alwaysEncryptedSettings": {
+				"alwaysEncryptedAkvAuthType": "ManagedIdentity"
+			}
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

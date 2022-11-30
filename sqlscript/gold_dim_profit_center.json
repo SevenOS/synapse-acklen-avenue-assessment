@@ -1,0 +1,20 @@
+{
+	"name": "gold_dim_profit_center",
+	"properties": {
+		"folder": {
+			"name": "gold_tables"
+		},
+		"content": {
+			"query": "DROP TABLE [gold].[dim_profit_center]\nGO\n\nSET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\n\nCREATE TABLE [gold].[dim_profit_center]\n( \n\t[profit_center_sk] bigint  NULL,\n\t[profit_center_code] bigint  NULL,\n\t[profit_center_description] [varchar](20)  NULL,\n\t[expenses_description] [varchar](10)  NULL\n)\nWITH\n(\n\tDISTRIBUTION = REPLICATE\n)\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "dw",
+				"poolName": "dw"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

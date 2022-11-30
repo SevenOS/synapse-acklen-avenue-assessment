@@ -1,0 +1,20 @@
+{
+	"name": "transaction_table",
+	"properties": {
+		"folder": {
+			"name": "silver_tables"
+		},
+		"content": {
+			"query": "select  \n        transactionpartitionkey as transaction_partition_key\n        ,transactionkey as transaction_key\n        ,transactiondatekey as transaction_date_key\n        ,businessdatekey as business_date_key\n        ,profitcenterkey as profit_center_key\n        ,storekey as store_key\n        ,profitcenterkey_orig as profit_center_key_orig\n        ,charges\n        ,debit\n        ,discounts\n        ,taxes\n        ,remittance\n        ,guestcount as guest_count\n        ,case   when refundamt = '(null)' then 0\n             else refundamt\n        end as refundamt\n        ,ssscount as sss_count\n        ,misccharges as misc_charges\nfrom    openrowset(bulk 'https://saacklenavenueassessment.blob.core.windows.net/bronze/transaction_db/transaction_schema/transaction/transaction.parquet',\n                  format = 'parquet') as rows\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

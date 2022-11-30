@@ -1,0 +1,20 @@
+{
+	"name": "query-3fn-discovery",
+	"properties": {
+		"folder": {
+			"name": "discovery"
+		},
+		"content": {
+			"query": "select  *\nfrom    openrowset(bulk 'https://saacklenavenueassessment.blob.core.windows.net/bronze/transaction_db/transaction_schema/transaction/transaction.parquet',\n                  format = 'parquet') as rows\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
